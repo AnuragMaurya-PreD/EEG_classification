@@ -9,7 +9,7 @@ import wandb
 # Use parser here for the arguments
 
 BATCH_SIZE=36
-LR=0.001
+LR=0.0001
 EPOCHS=50
 DEVICE=torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -35,8 +35,8 @@ csv_file='train_IN.csv'
 train_dataset=MindBigDataDataset(csv_file)
 train_loader=DataLoader(train_dataset,batch_size=BATCH_SIZE,shuffle=False)
 
-# model=EEG_classifier()
-model=ConvNet()
+model=Conv1D_classifier()
+# model=ConvNet()
 # model=Conv_multiple_path_classifier()
 model.to(DEVICE)
 criterion=nn.CrossEntropyLoss()
@@ -48,7 +48,8 @@ for epoch in range(EPOCHS):
     accuracy_train=0
     model.train()
     for batch in train_loader:
-        features=batch[0].to(DEVICE)
+        features=batch[0].float().to(DEVICE)
+        # import ipdb; ipdb.set_trace()
         labels=batch[1].to(DEVICE)
         # Forward pass
         outputs = model(features)
@@ -69,7 +70,7 @@ for epoch in range(EPOCHS):
     accuracy_test=0
     for batch in test_loader:
         with torch.no_grad():
-            features=batch[0].to(DEVICE)
+            features=batch[0].float().to(DEVICE)
             labels=batch[1].to(DEVICE)
             outputs=model(features)
             loss=criterion(outputs,labels)
